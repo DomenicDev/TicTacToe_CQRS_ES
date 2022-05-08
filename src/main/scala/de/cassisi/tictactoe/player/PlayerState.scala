@@ -8,8 +8,8 @@ class PlayerState {
   var playerName: PlayerName = _
 
   def apply(event: PlayerCreatedEvent): Unit = {
-    this.playerId = playerId
-    this.playerName = playerName
+    this.playerId = event.playerId
+    this.playerName = event.playerName
   }
 
   def apply(event: PlayerNameChangedEvent): Unit = {

@@ -5,8 +5,8 @@ import de.cassisi.tictactoe.player.{PlayerAggregate, PlayerId, PlayerName}
 
 class PlayerService(private val repository: PlayerRepository) {
 
-  def createPlayer(name: PlayerName): Unit = {
-    val player = PlayerAggregate.createNewPlayer(name)
+  def createPlayer(playerId: PlayerId, name: PlayerName): Unit = {
+    val player = PlayerAggregate.createNewPlayer(playerId, name)
     repository.saveNewPlayer(player)
   }
 
