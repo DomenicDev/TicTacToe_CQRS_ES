@@ -4,13 +4,16 @@ import de.cassisi.tictactoe.event.DomainEvent
 
 import scala.collection.mutable.ListBuffer
 
-abstract class AggregateRoot(private val events: List[DomainEvent]) {
+abstract class AggregateRoot[ID <: EntityId](private val entityId: ID, private val events: List[DomainEvent]) {
 
   private val changes: ListBuffer[DomainEvent] = ListBuffer[DomainEvent]()
-  private var version: Long = -1
+  private var version: Int = -1
 
   // rehydrate aggregate from specified events
   events.foreach(event => applyChange(event, isNew = false))
+
+  // the committed version is the version right after rehydration of events (after initialization)
+  private val committedVersion: Int = this.version
 
   def applyChange(event: DomainEvent): Unit = {
     applyChange(event, isNew = true)
@@ -34,6 +37,12 @@ abstract class AggregateRoot(private val events: List[DomainEvent]) {
 
   def getChanges: List[DomainEvent] = changes.toList
 
-  def getVersion: Long = this.version
+  def clearChanges(): Unit = this.changes.clear()
+
+  def getVersion: Int = this.version
+
+  def getVersionCommitted: Int = this.committedVersion
+
+  def getId: ID = this.entityId
 
 }

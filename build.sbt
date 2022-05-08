@@ -6,3 +6,5 @@ lazy val root = (project in file("."))
   .settings(
     name := "TicTacToe"
   )
+
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"

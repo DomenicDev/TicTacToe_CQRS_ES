@@ -7,4 +7,4 @@ class PlayerCreatedEvent
   private val playerId: PlayerId,
   val playerName: PlayerName,
 )
-  extends DomainEvent(playerId.id, 0, "player-created-event")
+  extends DomainEvent("player-created-event")

@@ -4,8 +4,10 @@ import de.cassisi.tictactoe.player.{PlayerAggregate, PlayerId}
 
 trait PlayerRepository {
 
-  def save(player: PlayerAggregate): Unit
+  def saveNewPlayer(player: PlayerAggregate): Unit
 
-  def getById(playerId: PlayerId): PlayerAggregate
+  def updatePlayer(player: PlayerAggregate): Unit
+
+  def getPlayer(playerId: PlayerId): PlayerAggregate
 
 }

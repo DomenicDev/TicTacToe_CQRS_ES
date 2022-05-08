@@ -10,8 +10,8 @@ object TicTacToeApp extends App {
 
   println("Welcome to TicTacToe")
 
-  val playerOne = PlayerId(UUID.randomUUID())
-  val playerTwo = PlayerId(UUID.randomUUID())
+  val playerOne = new PlayerId(UUID.randomUUID())
+  val playerTwo = new PlayerId(UUID.randomUUID())
 
   val game: GameSessionAggregate = new GameSessionAggregate(GameId.nextGameId(), playerOne, playerTwo)
 

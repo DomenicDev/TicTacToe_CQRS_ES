@@ -4,7 +4,6 @@ import de.cassisi.tictactoe.player.{PlayerId, PlayerName}
 
 class PlayerNameChangedEvent
 (
-  private val playerId: PlayerId,
-  private val version: Long,
+  val playerId: PlayerId,
   val newName: PlayerName
-) extends DomainEvent( playerId.id, version, "player-name-changed")
+) extends DomainEvent("player-name-changed-event")

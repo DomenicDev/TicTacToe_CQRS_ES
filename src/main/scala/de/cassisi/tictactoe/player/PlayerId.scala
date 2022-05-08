@@ -1,13 +1,15 @@
 package de.cassisi.tictactoe.player
 
+import de.cassisi.tictactoe.shared.EntityId
+
 import java.util.UUID
 
-case class PlayerId(id: UUID)
+class PlayerId(id: UUID) extends EntityId(id)
 
 object PlayerId {
 
   def next(): PlayerId = {
-    PlayerId(UUID.randomUUID())
+    new PlayerId(UUID.randomUUID())
   }
 
 }
