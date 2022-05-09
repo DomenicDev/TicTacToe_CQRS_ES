@@ -1,11 +1,13 @@
 package de.cassisi.tictactoe.player.event
 
-import de.cassisi.tictactoe.event.DomainEvent
+import de.cassisi.tictactoe.common.DomainEvent
 import de.cassisi.tictactoe.player.{PlayerId, PlayerName}
+
+import java.util.UUID
 
 class PlayerCreatedEvent
 (
-  val playerId: PlayerId,
-  val playerName: PlayerName,
+  val playerId: UUID,
+  val playerName: String,
 )
   extends DomainEvent("player-created-event")

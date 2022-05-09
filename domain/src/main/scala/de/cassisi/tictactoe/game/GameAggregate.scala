@@ -1,8 +1,7 @@
 package de.cassisi.tictactoe.game
 
 import com.typesafe.scalalogging.Logger
-import de.cassisi.tictactoe.repository.AggregateRoot
-import de.cassisi.tictactoe.event.DomainEvent
+import de.cassisi.tictactoe.common.{AggregateRoot, DomainEvent}
 import de.cassisi.tictactoe.game.command.{CreateNewGameCommand, PlaceNextMarkCommand}
 import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameCreatedEvent, MarkPlacedEvent, PlayerSwappedEvent}
 import de.cassisi.tictactoe.player.PlayerId
@@ -16,36 +15,47 @@ class GameAggregate(gameId: GameId, events: List[DomainEvent]) extends Aggregate
 
 
   def execute(command: PlaceNextMarkCommand): Unit = {
-    if (gameState.gameFinished) {
-      throw new IllegalStateException("Game has already finished!")
-    }
+    throwIfGameIsAlreadyOver()
+
+    // validate input
+    SquarePosition.checkValidity(command.position)
+
+    // convert to domain object
+    val position = SquarePosition.of(command.position)
 
     // check if the requested position is not marked yet
-    val position = command.position
-    val currentMarkAtPosition = this.gameState.gameGrid.getMarkAtPosition(position)
-    if (currentMarkAtPosition != Mark.EMPTY) {
-      throw new IllegalStateException("A mark has already been placed at the requested position")
-    }
+    throwIfAlreadyMarked(position)
+    applyChange(new MarkPlacedEvent(gameId.uuid, getCurrentPlayer.uuid, position.position))
 
-    applyChange(new MarkPlacedEvent(gameId, getCurrentPlayer, position))
-
+    // check if the current player has won
     if (gameState.hasCurrentPlayerWon) {
-      applyChange(new GameCompletedEvent(gameId, getCurrentPlayer))
+      applyChange(new GameCompletedEvent(gameId.uuid, getCurrentPlayer.uuid))
       return
     }
 
+    // check if the game is tied
     if (gameState.isTieGame) {
-      new GameCompletedEvent(gameId, null)
+      new GameCompletedEvent(gameId.uuid, null)
       return
     }
 
     // the game has not finished yet, so it's the next player's turn
     val nextPlayer = gameState.determineNextPlayer
-    applyChange(new PlayerSwappedEvent(gameId, nextPlayer))
+    applyChange(new PlayerSwappedEvent(gameId.uuid, nextPlayer.uuid))
   }
 
+  private def throwIfAlreadyMarked(position: SquarePosition): Unit = {
+    val currentMarkAtPosition = this.gameState.gameGrid.getMarkAtPosition(position)
+    if (currentMarkAtPosition != Mark.EMPTY) {
+      throw new IllegalStateException("A mark has already been placed at the requested position")
+    }
+  }
 
-
+  private def throwIfGameIsAlreadyOver(): Unit = {
+    if (gameState.gameFinished) {
+      throw new IllegalStateException("Game has already finished!")
+    }
+  }
 
   private def getCurrentPlayer: PlayerId = this.gameState.currentPlayer
 
@@ -66,13 +76,18 @@ object GameAggregate {
 
   def createNewGame(command: CreateNewGameCommand): GameAggregate = {
     // extract fields from command
-    val gameId = command.gameId
-    val playerOne = command.playerOne
-    val playerTwo = command.playerTwo
+    val gameUuid = command.gameId
+    val playerOneUuid = command.playerOne
+    val playerTwoUuid = command.playerTwo
+
+    // create domain objects
+    val gameId = GameId.of(gameUuid)
+    val playerOne = PlayerId.of(playerOneUuid)
+    val playerTwo = PlayerId.of(playerTwoUuid)
 
     // create and return game aggregate
     val gameAggregate = new GameAggregate(gameId, List.empty)
-    val gameCreatedEvent = new GameCreatedEvent(gameId, playerOne, playerTwo)
+    val gameCreatedEvent = new GameCreatedEvent(gameId.uuid, playerOne.uuid, playerTwo.uuid)
     gameAggregate.applyChange(gameCreatedEvent)
     gameAggregate
   }

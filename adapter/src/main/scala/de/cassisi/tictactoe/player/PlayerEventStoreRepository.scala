@@ -1,7 +1,6 @@
 package de.cassisi.tictactoe.player
 
-import de.cassisi.tictactoe.repository.AbstractEventStoreRepository
-import de.cassisi.tictactoe.event.DomainEvent
+import de.cassisi.tictactoe.common.{AbstractEventStoreRepository, DomainEvent}
 import de.cassisi.tictactoe.eventstore.EventStore
 
 class PlayerEventStoreRepository(private val eventStore: EventStore) extends AbstractEventStoreRepository[PlayerAggregate, PlayerId](eventStore) {

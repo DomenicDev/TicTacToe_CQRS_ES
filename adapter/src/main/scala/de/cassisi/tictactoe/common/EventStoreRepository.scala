@@ -1,4 +1,4 @@
-package de.cassisi.tictactoe.repository
+package de.cassisi.tictactoe.common
 
 trait EventStoreRepository[A <: AggregateRoot[ID], ID <: EntityId] {
 

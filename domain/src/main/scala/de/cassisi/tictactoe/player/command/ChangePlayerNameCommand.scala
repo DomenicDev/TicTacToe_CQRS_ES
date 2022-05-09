@@ -1,5 +1,7 @@
 package de.cassisi.tictactoe.player.command
 
-import de.cassisi.tictactoe.player.{PlayerId, PlayerName}
+import de.cassisi.tictactoe.common.Command
 
-case class ChangePlayerNameCommand(player: PlayerId, newName: PlayerName)
+import java.util.UUID
+
+case class ChangePlayerNameCommand(player: UUID, newName: String) extends Command

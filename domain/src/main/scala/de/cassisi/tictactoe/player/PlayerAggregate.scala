@@ -1,8 +1,7 @@
 package de.cassisi.tictactoe.player
 
 import com.typesafe.scalalogging.Logger
-import de.cassisi.tictactoe.event.DomainEvent
-import de.cassisi.tictactoe.repository.AggregateRoot
+import de.cassisi.tictactoe.common.{AggregateRoot, DomainEvent}
 import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
 import de.cassisi.tictactoe.player.event.{PlayerCreatedEvent, PlayerNameChangedEvent}
 
@@ -16,11 +15,9 @@ class PlayerAggregate(private val playerId: PlayerId, private val events: List[D
   loadFromHistory(events)
 
   def execute(command: ChangePlayerNameCommand): Unit = {
-    if (!(getId.equals(command.player))) {
-      throw new IllegalArgumentException("trying to update the wrong identity")
-    }
-
-    applyChange(new PlayerNameChangedEvent(getId, command.newName))
+    val newName = command.newName
+    PlayerName.checkValidity(newName)
+    applyChange(new PlayerNameChangedEvent(getUUID, newName))
   }
 
   override protected def handle(event: DomainEvent): Unit = {
@@ -37,13 +34,19 @@ class PlayerAggregate(private val playerId: PlayerId, private val events: List[D
 object PlayerAggregate {
 
   def createNewPlayer(command: CreatePlayerCommand): PlayerAggregate = {
-    val playerId = command.playerId
+    // extract fields
+    val id = command.playerId
     val playerName = command.name
 
+    // validate inputs
+    val playerId = PlayerId.of(id)
+    PlayerName.checkValidity(playerName)
+
+    // create and return aggregate
     val playerAggregate = new PlayerAggregate(playerId, List.empty)
-    val playerCreatedEvent = new PlayerCreatedEvent(playerId, playerName)
+    val playerCreatedEvent = new PlayerCreatedEvent(playerId.uuid, playerName)
     playerAggregate.applyChange(playerCreatedEvent)
-    return playerAggregate
+    playerAggregate
   }
 
 }

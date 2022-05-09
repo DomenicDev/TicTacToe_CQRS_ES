@@ -5,13 +5,13 @@ import de.cassisi.tictactoe.game.Mark.{EMPTY, Mark}
 
 case class GameGrid(private val squares: List[Square]) {
 
-  def placeMark(position: GridPosition, markToPlace: Mark): GameGrid = {
+  def placeMark(position: SquarePosition, markToPlace: Mark): GameGrid = {
     val positionToUpdate = getIndexForPosition(position)
     val updatedGrid: List[Square] = getUpdatedSquares(positionToUpdate, markToPlace)
     GameGrid(updatedGrid)
   }
 
-  def getMarkAtPosition(pos: GridPosition): Mark = {
+  def getMarkAtPosition(pos: SquarePosition): Mark = {
     val position = getIndexForPosition(pos)
     squares(position).mark
   }
@@ -24,7 +24,7 @@ case class GameGrid(private val squares: List[Square]) {
     squares.updated(positionToUpdate, Square(markToPlace))
   }
 
-  private def getIndexForPosition(gridPosition: GridPosition): Int = {
+  private def getIndexForPosition(gridPosition: SquarePosition): Int = {
     gridPosition.position - 1
   }
 

@@ -1,6 +1,5 @@
 package de.cassisi.tictactoe.game.command
 
-import de.cassisi.tictactoe.game.GameId
-import de.cassisi.tictactoe.player.PlayerId
+import java.util.UUID
 
-case class CreateNewGameCommand(gameId: GameId, playerOne: PlayerId, playerTwo: PlayerId)
+case class CreateNewGameCommand(gameId: UUID, playerOne: UUID, playerTwo: UUID)

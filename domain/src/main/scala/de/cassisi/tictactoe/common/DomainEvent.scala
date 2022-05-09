@@ -1,9 +1,9 @@
-package de.cassisi.tictactoe.event
+package de.cassisi.tictactoe.common
 
 import java.time.Instant
 import java.util.UUID
 
-case class DomainEvent(typeOfEvent: String) {
+class DomainEvent(val typeOfEvent: String) extends Message {
 
   val eventId: UUID = UUID.randomUUID()
   val eventTime: Instant = Instant.now()

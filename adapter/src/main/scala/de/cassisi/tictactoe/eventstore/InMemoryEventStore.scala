@@ -1,6 +1,6 @@
 package de.cassisi.tictactoe.eventstore
 
-import de.cassisi.tictactoe.event.DomainEvent
+import de.cassisi.tictactoe.common.DomainEvent
 
 import java.util.UUID
 import scala.collection.mutable

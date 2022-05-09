@@ -1,7 +1,9 @@
 package de.cassisi.tictactoe.game.event
 
-import de.cassisi.tictactoe.event.DomainEvent
+import de.cassisi.tictactoe.common.DomainEvent
 import de.cassisi.tictactoe.game.GameId
 import de.cassisi.tictactoe.player.PlayerId
 
-class PlayerSwappedEvent(val gameId: GameId, val nextPlayer: PlayerId) extends DomainEvent("player-swapped-event")
+import java.util.UUID
+
+class PlayerSwappedEvent(val gameId: UUID, val nextPlayer: UUID) extends DomainEvent("player-swapped-event")

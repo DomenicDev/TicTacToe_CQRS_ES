@@ -1,15 +1,15 @@
 package de.cassisi.tictactoe.game
 
-import de.cassisi.tictactoe.repository.EntityId
+import de.cassisi.tictactoe.common.EntityId
 
 import java.util.UUID
 
-class GameId(id: UUID) extends EntityId(id)
+case class GameId(id: UUID) extends EntityId(id)
 
 
 object GameId {
 
-  def nextGameId(): GameId = {
-    new GameId(UUID.randomUUID())
+  def of(id: UUID): GameId = {
+    new GameId(id)
   }
 }

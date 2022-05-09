@@ -1,7 +1,6 @@
-package de.cassisi.tictactoe.repository
+package de.cassisi.tictactoe.common
 
-import de.cassisi.tictactoe.event.DomainEvent
-
+import java.util.UUID
 import scala.collection.mutable.ListBuffer
 
 abstract class AggregateRoot[ID <: EntityId](private val entityId: ID) {
@@ -47,5 +46,7 @@ abstract class AggregateRoot[ID <: EntityId](private val entityId: ID) {
   def getVersionCommitted: Int = this.committedVersion
 
   def getId: ID = this.entityId
+
+  def getUUID: UUID = this.entityId.uuid
 
 }

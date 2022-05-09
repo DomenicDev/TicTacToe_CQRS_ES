@@ -1,5 +1,5 @@
 package de.cassisi.tictactoe.game.command
 
-import de.cassisi.tictactoe.game.GridPosition
+import java.util.UUID
 
-case class PlaceNextMarkCommand(position: GridPosition)
+case class PlaceNextMarkCommand(gameId: UUID, position: Int)

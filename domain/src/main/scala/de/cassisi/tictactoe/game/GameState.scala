@@ -16,22 +16,22 @@ class GameState {
   var gameGrid: GameGrid = _
 
   def apply(event: GameCreatedEvent): Unit = {
-    this.gameId = event.gameId
-    this.playerOne = event.playerOne
-    this.playerTwo = event.playerTwo
+    this.gameId = GameId.of(event.gameId)
+    this.playerOne = PlayerId.of(event.playerOne)
+    this.playerTwo = PlayerId.of(event.playerTwo)
     this.gameFinished = false
     this.currentPlayer = playerOne
     this.gameGrid = GameGrid.createEmptyGrid()
   }
 
   def apply(event: MarkPlacedEvent): Unit = {
-    val position = event.position
+    val position = SquarePosition.of(event.position)
     val markToPlace = getMark(currentPlayer)
     this.gameGrid = gameGrid.placeMark(position, markToPlace)
   }
 
   def apply(event: PlayerSwappedEvent): Unit = {
-    this.currentPlayer = event.nextPlayer
+    this.currentPlayer = PlayerId.of(event.nextPlayer)
   }
 
   def apply(event: GameCompletedEvent): Unit = {

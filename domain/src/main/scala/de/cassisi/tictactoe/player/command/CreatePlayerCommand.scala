@@ -1,5 +1,5 @@
 package de.cassisi.tictactoe.player.command
 
-import de.cassisi.tictactoe.player.{PlayerId, PlayerName}
+import java.util.UUID
 
-case class CreatePlayerCommand(playerId: PlayerId, name: PlayerName)
+case class CreatePlayerCommand(playerId: UUID, name: String) extends Serializable

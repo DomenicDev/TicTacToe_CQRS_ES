@@ -1,8 +1,12 @@
 package de.cassisi.tictactoe
 
 import de.cassisi.tictactoe.eventstore.InMemoryEventStore
-import de.cassisi.tictactoe.game.{GameEventStoreRepository, GameRepositoryImpl, GameService, GridPosition}
+import de.cassisi.tictactoe.game.command.{CreateNewGameCommand, PlaceNextMarkCommand}
+import de.cassisi.tictactoe.game.{GameEventStoreRepository, GameRepositoryImpl, GameService, SquarePosition}
 import de.cassisi.tictactoe.player._
+import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
+
+import java.util.UUID
 
 object TicTacToeApp extends App {
 
@@ -21,22 +25,24 @@ object TicTacToeApp extends App {
   val gameRepository = new GameRepositoryImpl(gameEventStoreRepository)
   val gameService = new GameService(gameRepository)
 
-  val playerId = PlayerId.next()
-  playerService.createPlayer(playerId, PlayerName("Domenic"))
-  playerService.updatePlayerName(playerId, PlayerName("Cassisi"))
+  val playerOneId = UUID.randomUUID()
+  val playerTwoId = UUID.randomUUID()
+
+  // create first player
+  playerService.handle(CreatePlayerCommand(playerOneId, "Domenic"))
+  playerService.handle(ChangePlayerNameCommand(playerOneId, "Cassisi"))
 
 
-  val playerOne = PlayerId.next()
-  val playerTwo = PlayerId.next()
+  val gameId = UUID.randomUUID()
 
-  val gameId = gameService.createNewGame(playerOne, playerTwo)
+  gameService.createNewGame(CreateNewGameCommand(gameId, playerOneId, playerTwoId))
 
   // play game session
-  gameService.placeMark(gameId, GridPosition(1))
-  gameService.placeMark(gameId, GridPosition(4))
-  gameService.placeMark(gameId, GridPosition(2))
-  gameService.placeMark(gameId, GridPosition(5))
-  gameService.placeMark(gameId, GridPosition(3))
+  gameService.placeMark(PlaceNextMarkCommand(gameId, 1))
+  gameService.placeMark(PlaceNextMarkCommand(gameId, 4))
+  gameService.placeMark(PlaceNextMarkCommand(gameId, 2))
+  gameService.placeMark(PlaceNextMarkCommand(gameId, 5))
+  gameService.placeMark(PlaceNextMarkCommand(gameId, 3))
 
 
 
