@@ -26,10 +26,15 @@ lazy val adapter = project.dependsOn(service)
     name := "adapter"
   )
 
-lazy val app_main = project.dependsOn(adapter)
+
+lazy val projection = (project in file("projection"))
+  .dependsOn(adapter)
+  .settings(
+    name := "projection"
+  )
+
+lazy val app_main = (project in file("app_main"))
+  .dependsOn(adapter, projection)
   .settings(
     name := "app_main"
   )
-
-//libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.36"
-//libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"

@@ -1,12 +1,20 @@
 package de.cassisi.tictactoe
 
+import de.cassisi.tictactoe.dto.GameStateDTO
 import de.cassisi.tictactoe.eventstore.InMemoryEventStore
 import de.cassisi.tictactoe.game.command.{CreateNewGameCommand, PlaceNextMarkCommand}
-import de.cassisi.tictactoe.game.{GameEventStoreRepository, GameRepositoryImpl, GameService, SquarePosition}
+import de.cassisi.tictactoe.game.{GameEventStoreRepository, GameRepositoryImpl, GameService}
+import de.cassisi.tictactoe.gamestate.InMemoryGameStateRepository
+import de.cassisi.tictactoe.handler.QueryHandler
 import de.cassisi.tictactoe.player._
 import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
+import de.cassisi.tictactoe.projection.{InMemoryCurrentStateProjection, InMemoryGameStateDatabase}
+import de.cassisi.tictactoe.projector.{CurrentGameStateProjector, SimpleEventSubscriber}
 
+import java.lang.Exception
 import java.util.UUID
+import scala.io.StdIn.readLine
+import scala.util.control.Breaks.break
 
 object TicTacToeApp extends App {
 
@@ -24,6 +32,18 @@ object TicTacToeApp extends App {
   val gameEventStoreRepository = new GameEventStoreRepository(eventStore)
   val gameRepository = new GameRepositoryImpl(gameEventStoreRepository)
   val gameService = new GameService(gameRepository)
+
+  val subscriber = new SimpleEventSubscriber()
+  val database = new InMemoryGameStateDatabase()
+  val projection = new InMemoryCurrentStateProjection(database)
+  val projector = new CurrentGameStateProjector(projection)
+  subscriber.addHandler(projector)
+  eventStore.subscribe(subscriber)
+
+  val gameStateRepository = new InMemoryGameStateRepository(database)
+  val queryHandler = new QueryHandler(gameStateRepository)
+
+  // PLAY A GAME....
 
   val playerOneId = UUID.randomUUID()
   val playerTwoId = UUID.randomUUID()
@@ -44,6 +64,76 @@ object TicTacToeApp extends App {
   gameService.placeMark(PlaceNextMarkCommand(gameId, 5))
   gameService.placeMark(PlaceNextMarkCommand(gameId, 3))
 
+  println(queryHandler.getCurrentGameState(gameId).gameGrid.mkString("Array(", ", ", ")"))
+
+
+  def visualizeGame(gameState: GameStateDTO): Unit = {
+    val squares = gameState.gameGrid
+    println("-------------")
+    println(s"| ${getCharacter(squares(0))} | ${getCharacter(squares(1))} | ${getCharacter(squares(2))} |")
+    println("-------------")
+    println(s"| ${getCharacter(squares(3))} | ${getCharacter(squares(4))} | ${getCharacter(squares(5))} |")
+    println("-------------")
+    println(s"| ${getCharacter(squares(6))} | ${getCharacter(squares(7))} | ${getCharacter(squares(8))} |")
+    println("-------------")
+  }
+
+  def getCharacter(value: Int): Character = {
+    value match {
+      case 0 => '_'
+      case 1 => 'X'
+      case 2 => 'O'
+      case _ => ' '
+    }
+  }
+
+  var exit: Boolean = false
+  do {
+
+    println("'1' => Start a new game")
+    println("'2' => Show Stats")
+    println("'3' => Exit Game")
+    val input = readLine()
+    if ("1".equals(input)) {
+      val gameId = UUID.randomUUID()
+      gameService.createNewGame(CreateNewGameCommand(gameId, playerOneId, playerTwoId))
+
+      var gameState = queryHandler.getCurrentGameState(gameId)
+      visualizeGame(gameState)
+      while (!gameState.completed) {
+        println("Enter the position of the next mark to place:")
+
+        var valid: Boolean = false
+        while (!valid) {
+          try {
+            valid = true
+
+            val pos = Integer.parseInt(readLine())
+            gameService.placeMark(PlaceNextMarkCommand(gameId, pos))
+
+            gameState = queryHandler.getCurrentGameState(gameId)
+            visualizeGame(gameState)
+
+          } catch {
+            case e: Exception => {
+              println(e)
+              valid = false
+            }
+          }
+        }
+      }
+
+      if (gameState.winner != null) {
+        println("Winner is: " + gameState.winner)
+      }
+
+    } else if ("2".equals(input)) {
+      // TODO
+    } else if ("3".equals(input)) {
+      exit = true
+    }
+
+  } while (!exit)
 
 
 }

@@ -53,7 +53,7 @@ class InMemoryEventStore extends EventStore {
   }
 
   def publishEvent(persistedEvent: PersistedEvent): Unit = {
-    this.subscribers.foreach(subscriber => subscriber.onEventPublished(persistedEvent))
+    this.subscribers.foreach(subscriber => subscriber.onEventPublished(persistedEvent.payload))
   }
 
   override def subscribe(subscriber: EventStoreSubscriber): Unit = {
