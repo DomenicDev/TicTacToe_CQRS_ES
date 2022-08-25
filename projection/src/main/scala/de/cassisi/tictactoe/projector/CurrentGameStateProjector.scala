@@ -1,12 +1,12 @@
 package de.cassisi.tictactoe.projector
-import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameCreatedEvent, MarkPlacedEvent, PlayerSwappedEvent}
-import de.cassisi.tictactoe.player.event.{PlayerCreatedEvent, PlayerNameChangedEvent}
+import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameOpenedEvent, MarkPlacedEvent, PlayerSwappedEvent}
+import de.cassisi.tictactoe.player.event.{PlayerRegisteredEvent, PlayerNameChangedEvent}
 import de.cassisi.tictactoe.projection.CurrentStateProjection
 
 class CurrentGameStateProjector(private val projection: CurrentStateProjection) extends EventHandler {
 
 
-  override def handle(event: GameCreatedEvent): Unit = {
+  override def handle(event: GameOpenedEvent): Unit = {
     projection.onGameCreated(event.gameId, event.playerOne, event.playerTwo)
   }
 
@@ -22,7 +22,7 @@ class CurrentGameStateProjector(private val projection: CurrentStateProjection) 
     projection.onGameFinished(event.gameId, event.winner)
   }
 
-  override def handle(event: PlayerCreatedEvent): Unit = {
+  override def handle(event: PlayerRegisteredEvent): Unit = {
     // ignore
   }
 

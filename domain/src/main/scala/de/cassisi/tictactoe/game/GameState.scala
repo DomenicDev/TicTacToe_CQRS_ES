@@ -1,7 +1,7 @@
 package de.cassisi.tictactoe.game
 
 import de.cassisi.tictactoe.game.Mark.Mark
-import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameCreatedEvent, MarkPlacedEvent, PlayerSwappedEvent}
+import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameOpenedEvent, MarkPlacedEvent, PlayerSwappedEvent}
 import de.cassisi.tictactoe.player.PlayerId
 
 class GameState {
@@ -15,7 +15,7 @@ class GameState {
 
   var gameGrid: GameGrid = _
 
-  def apply(event: GameCreatedEvent): Unit = {
+  def apply(event: GameOpenedEvent): Unit = {
     this.gameId = GameId.of(event.gameId)
     this.playerOne = PlayerId.of(event.playerOne)
     this.playerTwo = PlayerId.of(event.playerTwo)

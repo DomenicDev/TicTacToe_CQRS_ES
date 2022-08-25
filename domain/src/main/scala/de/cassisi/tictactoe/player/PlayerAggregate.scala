@@ -2,11 +2,11 @@ package de.cassisi.tictactoe.player
 
 import com.typesafe.scalalogging.Logger
 import de.cassisi.tictactoe.common.{AggregateRoot, DomainEvent}
-import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
-import de.cassisi.tictactoe.player.event.{PlayerCreatedEvent, PlayerNameChangedEvent}
+import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, RegisterPlayerCommand}
+import de.cassisi.tictactoe.player.event.{PlayerRegisteredEvent, PlayerNameChangedEvent}
 
 
-class PlayerAggregate(private val playerId: PlayerId, private val events: List[DomainEvent]) extends AggregateRoot[PlayerId](playerId) {
+class PlayerAggregate(playerId: PlayerId, private val events: List[DomainEvent]) extends AggregateRoot[PlayerId](playerId) {
 
   private val LOGGER = Logger(getClass)
 
@@ -22,7 +22,7 @@ class PlayerAggregate(private val playerId: PlayerId, private val events: List[D
 
   override protected def handle(event: DomainEvent): Unit = {
     event match {
-      case event: PlayerCreatedEvent => playerState.apply(event)
+      case event: PlayerRegisteredEvent => playerState.apply(event)
       case event: PlayerNameChangedEvent => playerState.apply(event)
       case other => LOGGER.warn(s"unsupported domain event $other")
     }
@@ -33,7 +33,7 @@ class PlayerAggregate(private val playerId: PlayerId, private val events: List[D
 
 object PlayerAggregate {
 
-  def createNewPlayer(command: CreatePlayerCommand): PlayerAggregate = {
+  def createNewPlayer(command: RegisterPlayerCommand): PlayerAggregate = {
     // extract fields
     val id = command.playerId
     val playerName = command.name
@@ -44,7 +44,7 @@ object PlayerAggregate {
 
     // create and return aggregate
     val playerAggregate = new PlayerAggregate(playerId, List.empty)
-    val playerCreatedEvent = new PlayerCreatedEvent(playerId.uuid, playerName)
+    val playerCreatedEvent = new PlayerRegisteredEvent(playerId.uuid, playerName)
     playerAggregate.applyChange(playerCreatedEvent)
     playerAggregate
   }

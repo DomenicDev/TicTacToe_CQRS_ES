@@ -1,11 +1,11 @@
 package de.cassisi.tictactoe.player
 
-import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
+import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, RegisterPlayerCommand}
 
 // this is a command handler
 class PlayerService(private val repository: PlayerRepository) {
 
-  def handle(command: CreatePlayerCommand): Unit = {
+  def handle(command: RegisterPlayerCommand): Unit = {
     val player = PlayerAggregate.createNewPlayer(command)
     repository.store(player)
   }

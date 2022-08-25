@@ -23,7 +23,8 @@ lazy val service = project.dependsOn(domain)
 
 lazy val adapter = project.dependsOn(service)
   .settings(
-    name := "adapter"
+    name := "adapter",
+    libraryDependencies += "com.h2database" % "h2" % "2.1.212"
   )
 
 

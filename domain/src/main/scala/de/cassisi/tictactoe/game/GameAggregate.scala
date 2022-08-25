@@ -2,8 +2,8 @@ package de.cassisi.tictactoe.game
 
 import com.typesafe.scalalogging.Logger
 import de.cassisi.tictactoe.common.{AggregateRoot, DomainEvent}
-import de.cassisi.tictactoe.game.command.{CreateNewGameCommand, PlaceNextMarkCommand}
-import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameCreatedEvent, MarkPlacedEvent, PlayerSwappedEvent}
+import de.cassisi.tictactoe.game.command.{OpenNewGameCommand, PlaceNextMarkCommand}
+import de.cassisi.tictactoe.game.event.{GameCompletedEvent, GameOpenedEvent, MarkPlacedEvent, PlayerSwappedEvent}
 import de.cassisi.tictactoe.player.PlayerId
 
 class GameAggregate(gameId: GameId, events: List[DomainEvent]) extends AggregateRoot[GameId](gameId) {
@@ -35,7 +35,7 @@ class GameAggregate(gameId: GameId, events: List[DomainEvent]) extends Aggregate
 
     // check if the game is tied
     if (gameState.isTieGame) {
-      new GameCompletedEvent(gameId.uuid, null)
+      applyChange(new GameCompletedEvent(gameId.uuid, null))
       return
     }
 
@@ -62,7 +62,7 @@ class GameAggregate(gameId: GameId, events: List[DomainEvent]) extends Aggregate
 
   override protected def handle(event: DomainEvent): Unit = {
     event match {
-      case event: GameCreatedEvent   => gameState(event)
+      case event: GameOpenedEvent   => gameState(event)
       case event: MarkPlacedEvent    => gameState(event)
       case event: PlayerSwappedEvent => gameState(event)
       case event: GameCompletedEvent => gameState(event)
@@ -74,7 +74,7 @@ class GameAggregate(gameId: GameId, events: List[DomainEvent]) extends Aggregate
 
 object GameAggregate {
 
-  def createNewGame(command: CreateNewGameCommand): GameAggregate = {
+  def createNewGame(command: OpenNewGameCommand): GameAggregate = {
     // extract fields from command
     val gameUuid = command.gameId
     val playerOneUuid = command.playerOne
@@ -87,7 +87,7 @@ object GameAggregate {
 
     // create and return game aggregate
     val gameAggregate = new GameAggregate(gameId, List.empty)
-    val gameCreatedEvent = new GameCreatedEvent(gameId.uuid, playerOne.uuid, playerTwo.uuid)
+    val gameCreatedEvent = new GameOpenedEvent(gameId.uuid, playerOne.uuid, playerTwo.uuid)
     gameAggregate.applyChange(gameCreatedEvent)
     gameAggregate
   }

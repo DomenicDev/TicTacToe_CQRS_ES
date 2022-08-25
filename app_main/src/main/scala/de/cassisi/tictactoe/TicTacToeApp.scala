@@ -2,14 +2,15 @@ package de.cassisi.tictactoe
 
 import de.cassisi.tictactoe.dto.GameStateDTO
 import de.cassisi.tictactoe.eventstore.InMemoryEventStore
-import de.cassisi.tictactoe.game.command.{CreateNewGameCommand, PlaceNextMarkCommand}
+import de.cassisi.tictactoe.game.command.{OpenNewGameCommand, PlaceNextMarkCommand}
 import de.cassisi.tictactoe.game.{GameEventStoreRepository, GameRepositoryImpl, GameService}
 import de.cassisi.tictactoe.gamestate.InMemoryGameStateRepository
 import de.cassisi.tictactoe.handler.QueryHandler
 import de.cassisi.tictactoe.player._
-import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, CreatePlayerCommand}
+import de.cassisi.tictactoe.player.command.{ChangePlayerNameCommand, RegisterPlayerCommand}
 import de.cassisi.tictactoe.projection.{InMemoryCurrentStateProjection, InMemoryGameStateDatabase}
 import de.cassisi.tictactoe.projector.{CurrentGameStateProjector, SimpleEventSubscriber}
+import de.cassisi.tictactoe.ranking.{InMemoryRankingDatabase, RankingProjector}
 
 import java.lang.Exception
 import java.util.UUID
@@ -37,7 +38,11 @@ object TicTacToeApp extends App {
   val database = new InMemoryGameStateDatabase()
   val projection = new InMemoryCurrentStateProjection(database)
   val projector = new CurrentGameStateProjector(projection)
+  val rankingDatabase = new InMemoryRankingDatabase()
+  val rankingProjector = new RankingProjector(rankingDatabase)
+
   subscriber.addHandler(projector)
+  subscriber.addHandler(rankingProjector)
   eventStore.subscribe(subscriber)
 
   val gameStateRepository = new InMemoryGameStateRepository(database)
@@ -49,13 +54,14 @@ object TicTacToeApp extends App {
   val playerTwoId = UUID.randomUUID()
 
   // create first player
-  playerService.handle(CreatePlayerCommand(playerOneId, "Domenic"))
+  playerService.handle(RegisterPlayerCommand(playerOneId, "Domenic"))
   playerService.handle(ChangePlayerNameCommand(playerOneId, "Cassisi"))
 
+  playerService.handle(RegisterPlayerCommand(playerTwoId, "Alfred"))
 
   val gameId = UUID.randomUUID()
 
-  gameService.createNewGame(CreateNewGameCommand(gameId, playerOneId, playerTwoId))
+  gameService.createNewGame(OpenNewGameCommand(gameId, playerOneId, playerTwoId))
 
   // play game session
   gameService.placeMark(PlaceNextMarkCommand(gameId, 1))
@@ -96,7 +102,7 @@ object TicTacToeApp extends App {
     val input = readLine()
     if ("1".equals(input)) {
       val gameId = UUID.randomUUID()
-      gameService.createNewGame(CreateNewGameCommand(gameId, playerOneId, playerTwoId))
+      gameService.createNewGame(OpenNewGameCommand(gameId, playerOneId, playerTwoId))
 
       var gameState = queryHandler.getCurrentGameState(gameId)
       visualizeGame(gameState)
@@ -128,7 +134,7 @@ object TicTacToeApp extends App {
       }
 
     } else if ("2".equals(input)) {
-      // TODO
+      rankingDatabase.getRankings.foreach(f => println(f._1 + ": " + f._2))
     } else if ("3".equals(input)) {
       exit = true
     }

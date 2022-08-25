@@ -5,7 +5,7 @@ import de.cassisi.tictactoe.player.{PlayerId, PlayerName}
 
 import java.util.UUID
 
-class PlayerCreatedEvent
+class PlayerRegisteredEvent
 (
   val playerId: UUID,
   val playerName: String,

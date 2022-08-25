@@ -1,13 +1,13 @@
 package de.cassisi.tictactoe.player
 
-import de.cassisi.tictactoe.player.event.{PlayerCreatedEvent, PlayerNameChangedEvent}
+import de.cassisi.tictactoe.player.event.{PlayerRegisteredEvent, PlayerNameChangedEvent}
 
 class PlayerState {
 
   var playerId: PlayerId = _
   var playerName: PlayerName = _
 
-  def apply(event: PlayerCreatedEvent): Unit = {
+  def apply(event: PlayerRegisteredEvent): Unit = {
     this.playerId = PlayerId.of(event.playerId)
     this.playerName = PlayerName.of(event.playerName)
   }
